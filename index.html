@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>旅遊共用記帳本</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy:      #18181b;
+    --navy-dark: #0e0e10;
+    --navy-mid:  #2a2a2e;
+    --blue:      #3b6df0;
+    --blue-light:#5c87ff;
+    --blue-pale: #e7e8eb;
+    --blue-card: #f2f3f5;
+    --white:     #ffffff;
+    --slate:     #9a9ca3;
+    --text:      #18181b;
+    --text-2:    #8b8d94;
+    --green:     #1fae66;
+    --orange:    #f5a623;
+    --red:       #ef4444;
+    --radius:    20px;
+    --radius-sm: 12px;
+    --shadow:    0 2px 10px rgba(20,20,22,0.05), 0 1px 2px rgba(20,20,22,0.04);
+    --shadow-lg: 0 16px 36px rgba(20,20,22,0.16);
+    --bg-page:   #eef0f3;
+  }
+  body {
+    font-family: 'Inter', -apple-system, 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+    background: var(--bg-page);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: calc(40px + env(safe-area-inset-bottom));
+  }
+
+  /* ── Header ── */
+  .header {
+    background: var(--navy-dark);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    padding: 0 24px;
+    padding-top: env(safe-area-inset-top);
+    height: calc(56px + env(safe-area-inset-top));
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .header-left { display: flex; align-items: center; gap: 12px; min-width: 0; overflow: hidden; }
+  .header-logo {
+    width: 28px; height: 28px;
+    background: var(--blue);
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .header-logo svg { width: 16px; height: 16px; fill: #fff; }
+  .header-title {
+    font-size: 15px; font-weight: 700;
+    color: #fff;
+    cursor: pointer;
+    letter-spacing: -0.2px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .header-title:hover { opacity: 0.8; }
+  .edit-name-btn {
+    font-size: 12px; font-weight: 500;
+    color: var(--slate);
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 5px;
+    padding: 3px 9px; cursor: pointer;
+    transition: background 0.15s, transform 0.12s ease;
+  }
+  .edit-name-btn:hover { background: rgba(255,255,255,0.14); color: #fff; }
+
+  /* Settings dropdown */
+  .settings-wrap { position: relative; flex-shrink: 0; }
+  .btn-settings {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: #fff;
+    padding: 7px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s, transform 0.12s ease;
+  }
+  .btn-settings:hover { background: rgba(255,255,255,0.15); }
+  .btn-settings:active, .edit-name-btn:active { transform: scale(0.95); }
+  .settings-dropdown {
+    display: none;
+    position: absolute; right: 0; top: calc(100% + 8px);
+    background: var(--white);
+    border-radius: var(--radius-sm);
+    min-width: 176px;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    z-index: 200;
+  }
+  .settings-dropdown.open { display: block; }
+  .settings-item {
+    display: block; width: 100%; text-align: left;
+    padding: 11px 16px; font-size: 14px; font-weight: 500;
+    background: none; border: none; cursor: pointer;
+    color: var(--text); font-family: inherit;
+    border-bottom: 1px solid var(--blue-pale);
+  }
+  .settings-item:last-child { border-bottom: none; }
+  .settings-item:hover { background: var(--blue-card); }
+  .settings-item.danger { color: var(--red); }
+
+  /* ── Content wrapper ── */
+  .content { padding: 20px 16px; max-width: 640px; margin: 0 auto; }
+
+  /* ── Form Card ── */
+  .card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow);
+  }
+  .card-section-title {
+    font-size: 12px; font-weight: 700; color: var(--text-2);
+    text-transform: uppercase; letter-spacing: 0.5px;
+    margin-bottom: 16px;
+  }
+  .form-group { margin-bottom: 12px; }
+  label { display: block; font-size: 12px; font-weight: 600; color: var(--text-2); margin-bottom: 5px; letter-spacing: 0.2px; }
+  .input-row { display: flex; gap: 8px; }
+  input, select {
+    width: 100%; padding: 11px 14px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid transparent;
+    background: var(--blue-card);
+    color: var(--navy);
+    font-size: 16px; font-family: inherit;
+    transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+    outline: none;
+  }
+  input:focus, select:focus { border-color: var(--blue); background: #fff; box-shadow: 0 0 0 3px rgba(59,109,240,0.12); }
+  input[type="datetime-local"] { padding: 11px 8px; }
+  .currency-hint { font-size: 12px; color: var(--blue); margin-top: 5px; font-weight: 600; }
+  .btn-primary {
+    background: var(--navy);
+    color: #fff;
+    border: none; width: 100%; padding: 14px;
+    border-radius: var(--radius-sm);
+    font-size: 15px; font-weight: 700;
+    margin-top: 6px; cursor: pointer;
+    font-family: inherit;
+    letter-spacing: -0.2px;
+    transition: background 0.15s, transform 0.12s ease;
+  }
+  .btn-primary:hover { background: var(--navy-mid); }
+  .btn-primary:active { transform: scale(0.97); }
+
+  /* ── Confetti ── */
+  .confetti-piece {
+    position: fixed; width: 8px; height: 8px; border-radius: 2px;
+    pointer-events: none; z-index: 500;
+    animation: confetti-burst 0.9s ease-out forwards;
+  }
+  @keyframes confetti-burst {
+    0% { transform: translate(-50%,-50%) scale(1) rotate(0deg); opacity: 1; }
+    100% { transform: translate(var(--tx), var(--ty)) scale(0.4) rotate(var(--rot)); opacity: 0; }
+  }
+
+  /* ── 進場 / 退場動效 ── */
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .card, .log-list { animation: fadeSlideUp 0.45s ease-out both; }
+  .log-list { animation-delay: 0.06s; }
+  .log-item { animation: fadeSlideUp 0.35s ease-out both; transition: opacity 0.2s ease, transform 0.2s ease, background 0.1s; }
+  .log-item:nth-child(2) { animation-delay: 0.02s; }
+  .log-item:nth-child(3) { animation-delay: 0.04s; }
+  .log-item:nth-child(4) { animation-delay: 0.06s; }
+  .log-item:nth-child(5) { animation-delay: 0.08s; }
+  .log-item:nth-child(6) { animation-delay: 0.10s; }
+  .log-item:nth-child(7) { animation-delay: 0.12s; }
+  .log-item.removing { opacity: 0; transform: translateX(24px) scale(0.97); }
+  @media (prefers-reduced-motion: reduce) {
+    .card, .log-list, .log-item, .confetti-piece { animation: none !important; }
+    * { transition: none !important; }
+  }
+
+  /* ── Modal ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(14,14,16,0.5);
+    z-index: 300; align-items: center; justify-content: center; padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--white); border-radius: var(--radius);
+    padding: 22px; width: 100%; max-width: 360px;
+    box-shadow: var(--shadow-lg);
+  }
+  .modal-title { font-size: 16px; font-weight: 700; color: var(--navy); margin-bottom: 16px; }
+  .rates-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .rate-item { display: flex; flex-direction: column; gap: 4px; }
+  .rate-item label { font-size: 11px; font-weight: 600; color: var(--text-2); margin-bottom: 0; }
+  .rate-item input { padding: 8px 10px; font-size: 14px; }
+  .rate-note { font-size: 11px; color: var(--text-2); margin-top: 10px; line-height: 1.6; }
+  .modal-actions { display: flex; gap: 8px; margin-top: 16px; }
+  .btn-save {
+    background: var(--blue); color: #fff;
+    border: none; flex: 1; padding: 11px;
+    border-radius: var(--radius-sm); font-size: 14px; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+    transition: background 0.15s, transform 0.12s ease;
+  }
+  .btn-save:hover { background: var(--blue-light); }
+  .btn-save:active, .btn-cancel:active { transform: scale(0.96); }
+  .btn-cancel {
+    background: none; border: 1.5px solid var(--blue-pale); color: var(--text-2);
+    flex: 1; padding: 11px; border-radius: var(--radius-sm);
+    font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit;
+    transition: transform 0.12s ease;
+  }
+
+  /* ── Log items ── */
+  .log-list { background: var(--white); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+  .log-list-header {
+    padding: 12px 16px;
+    font-size: 12px; font-weight: 700; color: var(--text-2);
+    text-transform: uppercase; letter-spacing: 0.4px;
+    border-bottom: 1px solid var(--blue-pale);
+    background: var(--blue-card);
+  }
+  .log-item {
+    display: flex; align-items: center; padding: 12px 16px;
+    border-bottom: 1px solid var(--blue-pale);
+    background: var(--white);
+    transition: background 0.1s;
+  }
+  .log-item:last-child { border-bottom: none; }
+  .log-item:hover { background: var(--blue-card); }
+  .log-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--blue); margin-right: 12px; flex-shrink: 0;
+  }
+  .log-info { flex: 1; }
+  .log-name { font-size: 14px; font-weight: 600; color: var(--navy); }
+  .log-sub { font-size: 11px; color: var(--text-2); margin-top: 2px; }
+  .log-amount { text-align: right; margin-right: 12px; }
+  .amt-twd { font-weight: 700; font-size: 15px; color: var(--navy); }
+  .amt-ori { font-size: 11px; color: var(--text-2); margin-top: 1px; }
+  .btn-del {
+    background: none; color: var(--text-2);
+    border: 1px solid var(--blue-pale);
+    padding: 5px 10px; border-radius: 6px;
+    cursor: pointer; font-size: 12px; font-family: inherit;
+    transition: all 0.15s;
+  }
+  .btn-del:hover { background: #fee2e2; color: var(--red); border-color: #fca5a5; }
+  .btn-del:active { transform: scale(0.93); }
+  .log-empty { padding: 32px; text-align: center; font-size: 13px; color: var(--text-2); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="header-logo">
+      <svg viewBox="0 0 16 16"><path d="M2 13L8 3l6 10H2z"/></svg>
+    </div>
+    <span id="trip-title" class="header-title" onclick="editTripName()">峇里島記帳本</span>
+    <button class="edit-name-btn" onclick="editTripName()">修改</button>
+  </div>
+  <div class="settings-wrap">
+    <button class="btn-settings" onclick="toggleSettings()">設定</button>
+    <div class="settings-dropdown" id="settings-dropdown">
+      <button class="settings-item" onclick="editPayerNames()">付款人名稱設定</button>
+      <button class="settings-item" onclick="openRateModal()">匯率設定</button>
+      <button class="settings-item" onclick="exportToCSV()">匯出 CSV</button>
+      <button class="settings-item danger" onclick="clearAllRecords()">清除全部紀錄</button>
+    </div>
+  </div>
+</div>
+
+<!-- 匯率 Modal -->
+<div class="modal-overlay" id="rate-modal">
+  <div class="modal">
+    <div class="modal-title">匯率設定</div>
+    <div class="form-group">
+      <label>預設幣別（新增紀錄時的初始選項）</label>
+      <select id="default-cur">
+        <option value="IDR">印尼盾 IDR</option>
+        <option value="TWD">台幣 TWD</option>
+        <option value="JPY">日幣 JPY</option>
+        <option value="USD">美金 USD</option>
+        <option value="VND">越南幣 VND</option>
+        <option value="AUD">澳幣 AUD</option>
+        <option value="CAD">加幣 CAD</option>
+      </select>
+    </div>
+    <div class="rates-grid">
+      <div class="rate-item">
+        <label>印尼盾 IDR → TWD</label>
+        <input id="rate-IDR" type="number" step="0.0001" placeholder="0.0021" />
+      </div>
+      <div class="rate-item">
+        <label>日幣 JPY → TWD</label>
+        <input id="rate-JPY" type="number" step="0.001" placeholder="0.215" />
+      </div>
+      <div class="rate-item">
+        <label>美金 USD → TWD</label>
+        <input id="rate-USD" type="number" step="0.1" placeholder="32.5" />
+      </div>
+      <div class="rate-item">
+        <label>越南幣 VND → TWD</label>
+        <input id="rate-VND" type="number" step="0.00001" placeholder="0.0013" />
+      </div>
+      <div class="rate-item">
+        <label>澳幣 AUD → TWD</label>
+        <input id="rate-AUD" type="number" step="0.1" placeholder="21.5" />
+      </div>
+      <div class="rate-item">
+        <label>加幣 CAD → TWD</label>
+        <input id="rate-CAD" type="number" step="0.1" placeholder="23.5" />
+      </div>
+      <div class="rate-item">
+        <label>台幣 TWD → TWD</label>
+        <input type="number" value="1" disabled style="opacity:0.45" />
+      </div>
+    </div>
+    <p class="rate-note">修改匯率只影響之後新增的記錄，已存記錄使用當時匯率不受影響。</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeRateModal()">取消</button>
+      <button class="btn-save" onclick="saveRates()">儲存匯率</button>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- 新增記帳表單（快速記帳，放最上方） -->
+  <div class="card">
+    <div class="card-section-title">新增記帳紀錄</div>
+    <div class="form-group">
+      <label>消費項目</label>
+      <input id="inp-item" type="text" placeholder="輸入項目名稱" autofocus />
+    </div>
+    <div class="form-group">
+      <label>金額（原幣）</label>
+      <div class="input-row">
+        <input id="inp-amount" type="number" placeholder="0.00" inputmode="decimal" oninput="updateExchangeHint()" style="flex:2" />
+        <select id="inp-cur" style="flex:1" onchange="updateExchangeHint()">
+          <option value="IDR">IDR</option>
+          <option value="TWD">TWD</option>
+          <option value="JPY">JPY</option>
+          <option value="USD">USD</option>
+          <option value="VND">VND</option>
+          <option value="AUD">AUD</option>
+          <option value="CAD">CAD</option>
+        </select>
+      </div>
+      <div id="exchange-hint" class="currency-hint"></div>
+    </div>
+    <div class="form-group">
+      <label>支付與分帳</label>
+      <div class="input-row">
+        <select id="inp-payer">
+          <option value="me">我支付</option>
+          <option value="friend">夥伴支付</option>
+        </select>
+        <select id="inp-split">
+          <option value="half">兩人平分</option>
+          <option value="all-me">全算我的</option>
+          <option value="all-friend">全算夥伴</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>日期與時間</label>
+      <input id="inp-datetime" type="datetime-local" />
+    </div>
+    <button class="btn-primary" onclick="addRecord()">新增記帳紀錄</button>
+  </div>
+
+  <!-- 流水帳 -->
+  <div class="log-list" id="log-body">
+    <div class="log-list-header">消費紀錄</div>
+    <div class="log-empty">尚無紀錄</div>
+  </div>
+</div>
+
+<script>
+const DEFAULT_RATES = { TWD: 1, JPY: 0.215, IDR: 0.0021, USD: 32.5, VND: 0.0013, AUD: 21.5, CAD: 23.5 };
+let rates = JSON.parse(localStorage.getItem('pwa_rates') || 'null') || { ...DEFAULT_RATES };
+let records = JSON.parse(localStorage.getItem('pwa_travel_v2') || '[]');
+let tripName = localStorage.getItem('pwa_trip_name') || '峇里島記帳本';
+let payerNames = JSON.parse(localStorage.getItem('pwa_payer_names') || 'null') || { me: '我', friend: '夥伴' };
+let defaultCurrency = localStorage.getItem('pwa_default_cur') || 'IDR';
+
+function initRateInputs() {
+  ['IDR','JPY','USD','VND','AUD','CAD'].forEach(c => { document.getElementById(`rate-${c}`).value = rates[c]; });
+  document.getElementById('default-cur').value = defaultCurrency;
+}
+function initTripName() {
+  document.getElementById('trip-title').textContent = tripName;
+  document.title = tripName || '旅遊記帳本';
+}
+function editTripName() {
+  const n = prompt('修改記帳本名稱：', tripName);
+  if (n && n.trim()) { tripName = n.trim(); localStorage.setItem('pwa_trip_name', tripName); initTripName(); }
+}
+function applyPayerNames() {
+  document.querySelector('#inp-payer option[value="me"]').textContent = `${payerNames.me}支付`;
+  document.querySelector('#inp-payer option[value="friend"]').textContent = `${payerNames.friend}支付`;
+  document.querySelector('#inp-split option[value="all-me"]').textContent = `全算${payerNames.me}的`;
+  document.querySelector('#inp-split option[value="all-friend"]').textContent = `全算${payerNames.friend}的`;
+}
+function editPayerNames() {
+  document.getElementById('settings-dropdown').classList.remove('open');
+  const me = prompt('輸入「我」的名稱：', payerNames.me);
+  if (me && me.trim()) payerNames.me = me.trim();
+  const friend = prompt('輸入「夥伴」的名稱：', payerNames.friend);
+  if (friend && friend.trim()) payerNames.friend = friend.trim();
+  localStorage.setItem('pwa_payer_names', JSON.stringify(payerNames));
+  applyPayerNames();
+  render();
+}
+function toggleSettings() {
+  document.getElementById('settings-dropdown').classList.toggle('open');
+}
+document.addEventListener('click', e => {
+  if (!document.querySelector('.settings-wrap').contains(e.target))
+    document.getElementById('settings-dropdown').classList.remove('open');
+});
+function openRateModal() {
+  document.getElementById('settings-dropdown').classList.remove('open');
+  document.getElementById('rate-modal').classList.add('open');
+}
+function closeRateModal() { document.getElementById('rate-modal').classList.remove('open'); }
+function saveRates() {
+  ['IDR','JPY','USD','VND','AUD','CAD'].forEach(c => {
+    const v = parseFloat(document.getElementById(`rate-${c}`).value);
+    if (!isNaN(v) && v > 0) rates[c] = v;
+  });
+  defaultCurrency = document.getElementById('default-cur').value;
+  localStorage.setItem('pwa_rates', JSON.stringify(rates));
+  localStorage.setItem('pwa_default_cur', defaultCurrency);
+  document.getElementById('inp-cur').value = defaultCurrency;
+  updateExchangeHint();
+  closeRateModal();
+  alert('匯率已儲存');
+}
+function updateExchangeHint() {
+  const amt = parseFloat(document.getElementById('inp-amount').value) || 0;
+  const cur = document.getElementById('inp-cur').value;
+  const twd = Math.round(amt * rates[cur]);
+  const nameMap = { IDR:'印尼盾', JPY:'日幣', USD:'美金', VND:'越南幣', AUD:'澳幣', CAD:'加幣' };
+  const name = nameMap[cur] || cur;
+  document.getElementById('exchange-hint').innerText =
+    cur === 'TWD' ? '' : `${name}換算约 台幣 $${twd.toLocaleString()} (匯率 ${rates[cur]})`;
+}
+function clearAllRecords() {
+  document.getElementById('settings-dropdown').classList.remove('open');
+  if (!records.length) { alert('目前沒有任何紀錄。'); return; }
+  if (!confirm(`確定要刪除全部 ${records.length} 筆紀錄？此操作無法復原。`)) return;
+  if (!confirm('再次確認：真的要清除所有記帳紀錄？')) return;
+  records = []; saveAndRender();
+}
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyEprjtdMHz9oyQlU0THAjCaY7PQblPfheoNK5cUm4gjx1k-cb4wJBUQZzq-scEXuWewA/exec';
+function sendToSheet(record) {
+  fetch(GAS_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(record)
+  }).catch(err => console.error('寫入 Google Sheet 失敗：', err));
+}
+function addRecord() {
+  const item = document.getElementById('inp-item').value.trim();
+  const oriAmt = parseFloat(document.getElementById('inp-amount').value);
+  const cur = document.getElementById('inp-cur').value;
+  const payer = document.getElementById('inp-payer').value;
+  const split = document.getElementById('inp-split').value;
+  const datetime = document.getElementById('inp-datetime').value;
+  if (!item || isNaN(oriAmt) || !datetime) return;
+  const usedRate = rates[cur];
+  const twdAmt = +(oriAmt * usedRate).toFixed(2);
+  let shareMe = split === 'half' ? twdAmt/2 : split === 'all-me' ? twdAmt : 0;
+  const record = { id: Date.now(), date: datetime, item, cur, oriAmt, twdAmt, payer, split, shareMe, usedRate };
+  records.unshift(record);
+  const splitLabel = split === 'half' ? '平均分配' : split === 'all-me' ? payerNames.me : payerNames.friend;
+  sendToSheet({ ...record, payer: payer === 'me' ? payerNames.me : payerNames.friend, split: splitLabel });
+  saveAndRender();
+  celebrate();
+  document.getElementById('inp-item').value = '';
+  document.getElementById('inp-amount').value = '';
+  document.getElementById('exchange-hint').innerText = '';
+}
+function saveAndRender() { localStorage.setItem('pwa_travel_v2', JSON.stringify(records)); render(); }
+function celebrate() {
+  const colors = ['#3b6df0','#1fae66','#f5a623','#ef4444','#5c87ff'];
+  const btn = document.querySelector('.btn-primary');
+  const rect = btn.getBoundingClientRect();
+  const cx = rect.left + rect.width/2, cy = rect.top;
+  for (let i = 0; i < 16; i++) {
+    const p = document.createElement('div');
+    p.className = 'confetti-piece';
+    const angle = Math.random()*Math.PI*2, dist = 60 + Math.random()*60;
+    p.style.left = cx + 'px'; p.style.top = cy + 'px';
+    p.style.background = colors[i % colors.length];
+    p.style.setProperty('--tx', `${Math.cos(angle)*dist}px`);
+    p.style.setProperty('--ty', `${Math.sin(angle)*dist - 40}px`);
+    p.style.setProperty('--rot', `${Math.random()*720-360}deg`);
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 900);
+  }
+}
+function fmt(s) {
+  const d = new Date(s);
+  return d.toLocaleString('zh-TW', { month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit', timeZone:'Asia/Taipei' });
+}
+function render() {
+  const splitMap = { half:'兩人平分', 'all-me':'全算我的', 'all-friend':'幫人墊款' };
+  const rows = records.map(r => {
+    const rn = r.cur !== 'TWD' && r.usedRate ? ` @${r.usedRate}` : '';
+    return `<div class="log-item" data-id="${r.id}">
+      <div class="log-dot"></div>
+      <div class="log-info">
+        <div class="log-name">${r.item}</div>
+        <div class="log-sub">${fmt(r.date)} · ${r.payer==='me'?payerNames.me:payerNames.friend}付 · ${r.cur} ${r.oriAmt.toLocaleString()}${rn}</div>
+      </div>
+      <div class="log-amount">
+        <div class="amt-twd">$${Math.round(r.twdAmt).toLocaleString()}</div>
+        <div class="amt-ori">${splitMap[r.split]}</div>
+      </div>
+      <button class="btn-del" onclick="deleteRecord(${r.id})">刪除</button>
+    </div>`;
+  });
+  const logBody = document.getElementById('log-body');
+  logBody.innerHTML = `<div class="log-list-header">消費紀錄（共 ${records.length} 筆）</div>` +
+    (rows.length ? rows.join('') : '<div class="log-empty">尚無紀錄</div>');
+
+  setDefaultDT();
+}
+function setDefaultDT() {
+  const el = document.getElementById('inp-datetime');
+  if (el.value) return;
+  const now = new Date();
+  el.value = new Date(now.getTime() + 8*3600000).toISOString().slice(0,16);
+}
+function exportToCSV() {
+  document.getElementById('settings-dropdown').classList.remove('open');
+  if (!records.length) return alert('資料庫空空如也');
+  const h = ['日期','項目','原幣','原幣金額','使用匯率','台幣總額','支付者','分帳方式','我的負擔'];
+  const csv = '\uFEFF' + h.join(',') + '\n' + records.map(r => [
+    fmt(r.date), `"${r.item.replace(/"/g,'""')}"`, r.cur, r.oriAmt,
+    r.usedRate||rates[r.cur], Math.round(r.twdAmt), r.payer==='me'?payerNames.me:payerNames.friend, r.split, Math.round(r.shareMe)
+  ].join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type:'text/csv;charset=utf-8;' }));
+  a.download = `記帳_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+function deleteRecord(id) {
+  if (!confirm('刪除此筆紀錄？')) return;
+  const el = document.querySelector(`.log-item[data-id="${id}"]`);
+  if (el) {
+    el.classList.add('removing');
+    setTimeout(() => { records = records.filter(r => r.id !== id); saveAndRender(); }, 200);
+  } else {
+    records = records.filter(r => r.id !== id); saveAndRender();
+  }
+}
+
+initRateInputs(); initTripName(); applyPayerNames(); render();
+document.getElementById('inp-cur').value = defaultCurrency;
+</script>
+</body>
+</html>
