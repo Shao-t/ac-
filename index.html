@@ -378,7 +378,7 @@
     </div>
     <div class="form-group">
       <label>日期與時間</label>
-      <input id="inp-datetime" type="datetime-local" />
+      <input id="inp-datetime" type="datetime-local" oninput="dtTouched = true" />
     </div>
     <button class="btn-primary" onclick="addRecord()">新增記帳紀錄</button>
   </div>
@@ -397,6 +397,7 @@ let records = JSON.parse(localStorage.getItem('pwa_travel_v2') || '[]');
 let tripName = localStorage.getItem('pwa_trip_name') || '峇里島記帳本';
 let payerNames = JSON.parse(localStorage.getItem('pwa_payer_names') || 'null') || { me: '我', friend: '夥伴' };
 let defaultCurrency = localStorage.getItem('pwa_default_cur') || 'IDR';
+let dtTouched = false;
 
 function initRateInputs() {
   ['IDR','JPY','USD','VND','AUD','CAD'].forEach(c => { document.getElementById(`rate-${c}`).value = rates[c]; });
@@ -489,6 +490,7 @@ function addRecord() {
   let shareMe = split === 'half' ? twdAmt/2 : split === 'all-me' ? twdAmt : 0;
   const record = { id: Date.now(), date: datetime, item, cur, oriAmt, twdAmt, payer, split, shareMe, usedRate };
   records.unshift(record);
+  dtTouched = false;
   const splitLabel = split === 'half' ? '平均分配' : split === 'all-me' ? payerNames.me : payerNames.friend;
   sendToSheet({ ...record, payer: payer === 'me' ? payerNames.me : payerNames.friend, split: splitLabel });
   saveAndRender();
@@ -545,7 +547,7 @@ function render() {
 }
 function setDefaultDT() {
   const el = document.getElementById('inp-datetime');
-  if (el.value) return;
+  if (dtTouched) return;
   const now = new Date();
   el.value = new Date(now.getTime() + 8*3600000).toISOString().slice(0,16);
 }
