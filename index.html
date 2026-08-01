@@ -841,17 +841,31 @@ function getSplitLabel(record) {
     friend:record.friendNameSnapshot || payerNames.friend
   }));
 }
-function buildSheetPayload(book, record) {
+function buildSheetPayload(record) {
+  // POST 內容嚴格維持原 GAS 的九個欄位；不把驗證資訊寫進資料列。
   return {
-    action:'appendExpense', appId:SHEET_CONFIG.appId, token:SHEET_CONFIG.writeToken,
-    sentAt:Date.now(), nonce:makeNonce(), bookId:book.id,
-    bookName:safeSpreadsheetText(record.tripNameSnapshot || book.name),
-    recordId:record.id, date:record.date,
-    item:safeSpreadsheetText(record.item), cur:record.cur, oriAmt:record.oriAmt,
-    twdAmt:record.twdAmt, usedRate:record.usedRate,
+    date:record.date,
+    item:safeSpreadsheetText(record.item),
+    cur:record.cur,
+    oriAmt:record.oriAmt,
+    usedRate:record.usedRate,
+    twdAmt:record.twdAmt,
     payer:safeSpreadsheetText(getRecordPayerName(record)),
-    split:safeSpreadsheetText(getSplitLabel(record)), shareMe:record.shareMe
+    split:safeSpreadsheetText(getSplitLabel(record)),
+    shareMe:record.shareMe
   };
+}
+function buildSheetPostUrl(book, record) {
+  const params = new URLSearchParams({
+    action:'appendExpense',
+    appId:SHEET_CONFIG.appId,
+    token:SHEET_CONFIG.writeToken,
+    sentAt:String(Date.now()),
+    nonce:makeNonce(),
+    recordId:String(record.id),
+    bookId:String(book.id)
+  });
+  return `${SHEET_CONFIG.url}?${params.toString()}`;
 }
 function findBookAndRecord(bookId, recordId) {
   const book = books.find(entry => entry.id === bookId);
@@ -898,10 +912,10 @@ async function sendToSheet(bookId, recordId, { quiet=false } = {}) {
     let postError = null;
     try {
       await Promise.race([
-        fetch(SHEET_CONFIG.url, {
+        fetch(buildSheetPostUrl(book, record), {
           method:'POST', mode:'no-cors', keepalive:true,
           headers:{ 'Content-Type':'text/plain;charset=utf-8' },
-          body:JSON.stringify(buildSheetPayload(book, record))
+          body:JSON.stringify(buildSheetPayload(record))
         }),
         delay(10000).then(() => { throw new Error('Sheet 送出逾時'); })
       ]);
