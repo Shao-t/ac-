@@ -270,11 +270,7 @@
 <body>
 <div class="app-shell">
   <header class="topbar">
-    <div class="topbar-left">
-      <button type="button" class="icon-button" id="book-menu-btn" aria-label="切換或新增帳本">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
-      </button>
-    </div>
+    <div class="topbar-left"></div>
     <div class="topbar-title-wrap">
       <button type="button" id="trip-title" class="header-title">旅行記帳本</button>
       <button type="button" class="edit-name-btn" id="edit-name-btn" aria-label="修改帳本名稱">
@@ -290,7 +286,6 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21h-4v-.1A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3v-4h.1A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h4v.1A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.16.37.37.7.6 1 .28.32.67.5 1.1.5h.1v4h-.1c-.43 0-.82.18-1.1.5-.23.3-.44.63-.6 1Z"/></svg>
         </button>
         <div class="settings-dropdown" id="settings-dropdown">
-          <button type="button" class="settings-item" id="book-settings-btn">切換／新增帳本</button>
           <button type="button" class="settings-item" id="payer-settings-btn">付款人名稱設定</button>
           <button type="button" class="settings-item" id="rate-settings-btn">匯率設定</button>
           <button type="button" class="settings-item" id="export-btn">匯出 CSV</button>
@@ -354,7 +349,7 @@
     <div class="form-group"><label for="inp-item">消費項目</label><input id="inp-item" type="text" maxlength="80" placeholder="例如：餐廳、車票、門票" autocomplete="off" /></div>
     <div class="form-group">
       <label for="inp-amount">金額（原幣）</label>
-      <div class="input-row"><input id="inp-amount" type="number" min="0.00000001" step="any" max="1000000000000" placeholder="0.00" inputmode="decimal" style="flex:2" /><select id="inp-cur" style="flex:1"><option value="IDR">IDR</option><option value="TWD">TWD</option><option value="JPY">JPY</option><option value="USD">USD</option><option value="VND">VND</option><option value="AUD">AUD</option><option value="CAD">CAD</option></select></div>
+      <div class="input-row"><input id="inp-amount" type="number" min="0.00000001" step="any" max="1000000000000" placeholder="0.00" inputmode="decimal" style="flex:2" /><select id="inp-cur" style="flex:1"><option value="IDR">IDR</option><option value="TWD">TWD</option><option value="JPY">JPY</option><option value="USD">USD</option><option value="VND">VND</option><option value="AUD">AUD</option><option value="CAD">CAD</option><option value="EUR">EUR</option><option value="GBP">GBP</option><option value="CNY">CNY</option><option value="CHF">CHF</option><option value="HKD">HKD</option><option value="SGD">SGD</option></select></div>
       <div id="exchange-hint" class="currency-hint" aria-live="polite"></div>
     </div>
     <div class="form-group"><label>支付與分帳</label><div class="input-row"><select id="inp-payer" aria-label="支付者"><option value="me">我支付</option><option value="friend">夥伴支付</option></select><select id="inp-split" aria-label="分帳方式"><option value="half">兩人平分</option><option value="all-me">全算我的</option><option value="all-friend">全算夥伴</option></select></div></div>
@@ -367,14 +362,20 @@
 <div class="modal-overlay" id="rate-modal" aria-hidden="true">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="rate-modal-title">
     <div class="modal-head"><div class="modal-title" id="rate-modal-title">匯率設定</div><button type="button" class="modal-close" id="rate-close-btn" aria-label="關閉">×</button></div>
-    <div class="form-group"><label for="default-cur">預設幣別</label><select id="default-cur"><option value="IDR">印尼盾 IDR</option><option value="TWD">台幣 TWD</option><option value="JPY">日幣 JPY</option><option value="USD">美金 USD</option><option value="VND">越南幣 VND</option><option value="AUD">澳幣 AUD</option><option value="CAD">加幣 CAD</option></select></div>
+    <div class="form-group"><label for="default-cur">預設幣別</label><select id="default-cur"><option value="IDR">印尼盾 IDR</option><option value="TWD">台幣 TWD</option><option value="JPY">日幣 JPY</option><option value="USD">美金 USD</option><option value="VND">越南幣 VND</option><option value="AUD">澳幣 AUD</option><option value="CAD">加幣 CAD</option><option value="EUR">歐元 EUR</option><option value="GBP">英鎊 GBP</option><option value="CNY">人民幣 CNY</option><option value="CHF">瑞士法郎 CHF</option><option value="HKD">港幣 HKD</option><option value="SGD">新加坡幣 SGD</option></select></div>
     <div class="rates-grid">
       <div class="rate-item"><label for="rate-IDR">IDR → TWD</label><input id="rate-IDR" type="number" min="0.00000001" step="0.0001" inputmode="decimal" /></div>
       <div class="rate-item"><label for="rate-JPY">JPY → TWD</label><input id="rate-JPY" type="number" min="0.00000001" step="0.001" inputmode="decimal" /></div>
       <div class="rate-item"><label for="rate-USD">USD → TWD</label><input id="rate-USD" type="number" min="0.00000001" step="0.1" inputmode="decimal" /></div>
       <div class="rate-item"><label for="rate-VND">VND → TWD</label><input id="rate-VND" type="number" min="0.00000001" step="0.00001" inputmode="decimal" /></div>
+      <div class="rate-item"><label for="rate-EUR">EUR → TWD</label><input id="rate-EUR" type="number" min="0.00000001" step="0.01" inputmode="decimal" /></div>
       <div class="rate-item"><label for="rate-AUD">AUD → TWD</label><input id="rate-AUD" type="number" min="0.00000001" step="0.1" inputmode="decimal" /></div>
       <div class="rate-item"><label for="rate-CAD">CAD → TWD</label><input id="rate-CAD" type="number" min="0.00000001" step="0.1" inputmode="decimal" /></div>
+      <div class="rate-item"><label for="rate-GBP">GBP → TWD</label><input id="rate-GBP" type="number" min="0.00000001" step="0.1" inputmode="decimal" /></div>
+      <div class="rate-item"><label for="rate-CNY">CNY → TWD</label><input id="rate-CNY" type="number" min="0.00000001" step="0.01" inputmode="decimal" /></div>
+      <div class="rate-item"><label for="rate-CHF">CHF → TWD</label><input id="rate-CHF" type="number" min="0.00000001" step="0.1" inputmode="decimal" /></div>
+      <div class="rate-item"><label for="rate-HKD">HKD → TWD</label><input id="rate-HKD" type="number" min="0.00000001" step="0.01" inputmode="decimal" /></div>
+      <div class="rate-item"><label for="rate-SGD">SGD → TWD</label><input id="rate-SGD" type="number" min="0.00000001" step="0.01" inputmode="decimal" /></div>
       <div class="rate-item"><label>TWD → TWD</label><input type="number" value="1" disabled style="opacity:.45" /></div>
     </div>
     <p class="rate-note">修改匯率只影響之後新增的紀錄；既有紀錄仍使用當時匯率。</p>
@@ -398,9 +399,9 @@
 <script>
 'use strict';
 
-const DEFAULT_RATES = Object.freeze({ TWD:1, JPY:0.215, IDR:0.0021, USD:32.5, VND:0.0013, AUD:21.5, CAD:23.5 });
-const CURRENCIES = Object.freeze(['IDR','TWD','JPY','USD','VND','AUD','CAD']);
-const RATE_CURRENCIES = Object.freeze(['IDR','JPY','USD','VND','AUD','CAD']);
+const DEFAULT_RATES = Object.freeze({ TWD:1, JPY:0.215, IDR:0.0021, USD:32.5, VND:0.0013, AUD:21.5, CAD:23.5, EUR:36.6, GBP:41.5, CNY:4.5, CHF:40.7, HKD:4.07, SGD:25.4 });
+const CURRENCIES = Object.freeze(['IDR','TWD','JPY','USD','VND','AUD','CAD','EUR','GBP','CNY','CHF','HKD','SGD']);
+const RATE_CURRENCIES = Object.freeze(['IDR','JPY','USD','VND','AUD','CAD','EUR','GBP','CNY','CHF','HKD','SGD']);
 const VALID_PAYERS = new Set(['me','friend']);
 const VALID_SPLITS = new Set(['half','all-me','all-friend']);
 const VALID_SYNC_STATES = new Set(['legacy','pending','synced','failed']);
@@ -714,45 +715,6 @@ function editTripName() {
   initTripName();
   alert('帳本已重新命名；既有紀錄保留建立當時的帳本名稱與付款人名稱。');
 }
-function manageBooks() {
-  closeSettings();
-  const currentIndex = books.findIndex(book => book.id === activeBook.id);
-  const list = books.map((book, index) => `${index+1}. ${book.name}（${book.records.length} 筆）${book.id === activeBook.id ? ' ←目前' : ''}`).join('\n');
-  const answer = prompt(`輸入編號切換帳本，或輸入 N 建立新帳本：\n\n${list}`, String(currentIndex+1));
-  if (answer === null) return;
-  if (/^n$/i.test(answer.trim())) {
-    const nameInput = prompt('新帳本名稱：', '新旅行記帳本');
-    if (nameInput === null) return;
-    const name = normalizeName(nameInput, '');
-    if (!name) return alert('帳本名稱不可空白。');
-    const previousBook = activeBook;
-    const newBook = createBook(name, payerNames, rates, defaultCurrency, []);
-    books.push(newBook);
-    activeBook = newBook;
-    loadActiveBookState();
-    if (!persistBooks()) {
-      books = books.filter(book => book.id !== newBook.id);
-      activeBook = previousBook;
-      loadActiveBookState();
-      return alert('建立帳本失敗，請確認瀏覽器未封鎖本機儲存。');
-    }
-    refreshActiveBookUI();
-    return alert('已建立獨立新帳本；舊帳本紀錄未被修改。');
-  }
-  const index = Number(answer.trim()) - 1;
-  if (!Number.isInteger(index) || !books[index]) return alert('請輸入有效的帳本編號。');
-  if (books[index].id === activeBook.id) return;
-  if (!persistBooks()) return alert('目前帳本儲存失敗，無法切換。');
-  const previousBook = activeBook;
-  activeBook = books[index];
-  loadActiveBookState();
-  if (!writeStorage(ACTIVE_BOOK_KEY, activeBook.id)) {
-    activeBook = previousBook;
-    loadActiveBookState();
-    return alert('帳本切換狀態儲存失敗。');
-  }
-  refreshActiveBookUI();
-}
 function editPayerNames() {
   closeSettings();
   const meInput = prompt('輸入「我」的新名稱：', payerNames.me);
@@ -811,7 +773,7 @@ function updateExchangeHint() {
   const hint = document.getElementById('exchange-hint');
   if (!Number.isFinite(amount) || amount <= 0 || !Number.isFinite(rates[currency])) { hint.textContent = ''; return; }
   const twd = amount * rates[currency];
-  const nameMap = { IDR:'印尼盾', JPY:'日幣', USD:'美金', VND:'越南幣', AUD:'澳幣', CAD:'加幣' };
+  const nameMap = { IDR:'印尼盾', JPY:'日幣', USD:'美金', VND:'越南幣', AUD:'澳幣', CAD:'加幣', EUR:'歐元', GBP:'英鎊', CNY:'人民幣', CHF:'瑞士法郎', HKD:'港幣', SGD:'新加坡幣' };
   hint.textContent = currency === 'TWD' ? '' : `${nameMap[currency] || currency}換算約台幣 $${Math.round(twd).toLocaleString('zh-TW')}（匯率 ${rates[currency]}）`;
 }
 function saveAndRender() {
@@ -1073,10 +1035,8 @@ function deleteRecord(id) {
 // Events
 document.getElementById('trip-title').addEventListener('click', editTripName);
 document.getElementById('edit-name-btn').addEventListener('click', editTripName);
-document.getElementById('book-menu-btn').addEventListener('click', manageBooks);
 document.getElementById('payer-quick-btn').addEventListener('click', editPayerNames);
 document.getElementById('settings-btn').addEventListener('click', toggleSettings);
-document.getElementById('book-settings-btn').addEventListener('click', manageBooks);
 document.getElementById('payer-settings-btn').addEventListener('click', editPayerNames);
 document.getElementById('rate-settings-btn').addEventListener('click', openRateModal);
 document.getElementById('rate-card-btn').addEventListener('click', openRateModal);
